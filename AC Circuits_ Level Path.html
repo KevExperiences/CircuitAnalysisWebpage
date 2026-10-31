@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AC Nodal Analysis – Lesson</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+:root{--bg:#fff;--tx:#3c3c3c;--mut:#777;--line:#e5e5e5;--card:#fff;--g:#58cc02;--gd:#58a700;--b:#1cb0f6;--bd:#1899d6;--r:#ff4b4b;--rd:#ea2b2b;--gs:#d7ffb8;--rs:#ffdfe0;--bs:#ddf4ff;--hl:#fff3b0;--vl:#1f9d00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131f24;--tx:#f1f7fb;--mut:#9fb0ba;--line:#37464f;--card:#131f24;--gs:#1d3a12;--rs:#3d1f22;--bs:#12384a;--hl:#4a3f12;--vl:#58cc02}}
+:root[data-theme="dark"]{--bg:#131f24;--tx:#f1f7fb;--mut:#9fb0ba;--line:#37464f;--card:#131f24;--gs:#1d3a12;--rs:#3d1f22;--bs:#12384a;--hl:#4a3f12;--vl:#58cc02}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:17px/1.45 "Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;justify-content:center}
+math{font-family:"STIX Two Math","Latin Modern Math","Cambria Math","Noto Sans Math",serif;font-size:1.15em}
+#app{width:100%;max-width:560px;height:100%;display:flex;flex-direction:column;position:relative}
+.top{display:flex;align-items:center;gap:10px;padding:12px 16px 6px}
+.bar{flex:1;height:16px;background:var(--line);border-radius:10px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--g);border-radius:10px;transition:width .4s;position:relative}
+.bar i:after{content:"";position:absolute;left:8px;right:8px;top:3px;height:4px;background:rgba(255,255,255,.35);border-radius:4px}
+.pill{font-weight:800;font-size:15px;white-space:nowrap}.xp{color:#ffb100}.st{color:#ff9600}
+.scroll{flex:1;overflow-y:auto;padding:4px 16px 280px}
+.cir{border:2px solid var(--line);border-radius:16px;padding:6px 8px 2px}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--tx);font-size:14px;font-family:"STIX Two Text","Times New Roman",serif;font-style:italic}svg .m{fill:var(--mut)}svg .v{fill:var(--vl);font-weight:700;font-style:normal;font-family:inherit}svg .u{font-style:normal}
+svg path,svg circle.s{stroke:var(--tx);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+svg g.on path,svg g.on circle.s{stroke:var(--b);stroke-width:4}
+svg .nd{fill:var(--tx);stroke:none}
+svg .click{fill:transparent;stroke:var(--b);stroke-width:2.5;stroke-dasharray:4 4;cursor:pointer}svg .click.sel{fill:var(--bs);stroke-dasharray:none}
+.work{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;min-height:30px}
+.work span{flex:none;background:var(--bs);color:var(--bd);font-weight:800;font-size:13px;padding:3px 10px;border-radius:12px;white-space:nowrap}
+.stage{margin:12px 0 2px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--b)}
+.q{font-size:21px;font-weight:800;margin:2px 0 8px;line-height:1.35}
+.f{display:inline-block;background:var(--bs);border-radius:10px;padding:4px 12px;margin-bottom:10px}
+.hb{float:right;border:2px solid var(--line);border-bottom-width:4px;background:var(--card);color:var(--tx);border-radius:12px;font:inherit;font-weight:800;font-size:14px;padding:3px 10px;cursor:pointer}
+.hint{background:var(--hl);border-radius:12px;padding:8px 12px;margin:6px 0 10px;font-size:15px}
+.opt{display:block;width:100%;text-align:left;padding:14px 16px;margin:10px 0;background:var(--card);color:var(--tx);font:inherit;font-weight:700;font-size:18px;border:2px solid var(--line);border-bottom-width:5px;border-radius:16px;cursor:pointer}
+.opt.sel{border-color:var(--b);background:var(--bs);color:var(--bd)}.opt.x{opacity:.4}
+.ans{min-height:56px;display:flex;flex-wrap:wrap;gap:8px;padding:10px 0;border-top:2px solid var(--line);border-bottom:2px solid var(--line);margin:8px 0 14px}
+.chip{padding:10px 14px;font:inherit;font-weight:700;font-size:17px;border:2px solid var(--line);border-bottom-width:4px;border-radius:12px;background:var(--card);color:var(--tx);cursor:pointer}.chip.used{opacity:.25;pointer-events:none}
+.bank{display:flex;flex-wrap:wrap;gap:8px}
+.foot{position:absolute;left:0;right:0;bottom:0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:2px solid var(--line);transition:background .2s}
+.foot.ok{background:var(--gs);border-color:var(--gs)}.foot.no{background:var(--rs);border-color:var(--rs)}
+.msg{display:none;margin-bottom:12px;font-size:15px}.foot.ok .msg,.foot.no .msg{display:block}
+.msg b{display:block;font-size:21px;margin-bottom:2px}.foot.ok b{color:#58a700}.foot.no b{color:var(--rd)}
+.go{width:100%;padding:15px;border:0;border-bottom:5px solid var(--gd);border-radius:16px;background:var(--g);color:#fff;font:inherit;font-weight:800;font-size:18px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.go:disabled{background:var(--line);border-bottom-color:#c4c4c4;color:#afafaf;cursor:default}
+.foot.no .go{background:var(--r);border-bottom-color:var(--rd)}
+.sa{display:none;background:none;border:0;color:var(--rd);font:inherit;font-weight:800;margin:0 0 10px;padding:0;text-decoration:underline;cursor:pointer}
+.big{text-align:center;padding:30px 0}.big h2{font-size:28px;margin:8px 0}
+
+#home{overflow-y:auto;height:100%}#lesson{display:none;position:relative;flex:1;flex-direction:column;min-height:0}
+.hd{display:flex;justify-content:space-between;align-items:center;padding:16px;font-size:22px;font-weight:800;position:sticky;top:0;background:var(--bg);border-bottom:2px solid var(--line);z-index:2}
+.path{display:flex;flex-direction:column;align-items:center;gap:40px;padding:44px 16px 80px}
+.lv{display:flex;flex-direction:column;align-items:center;width:210px;position:relative}
+.lv:nth-child(odd){transform:translateX(-36px)}.lv:nth-child(even){transform:translateX(36px)}
+.nb{width:88px;height:88px;border-radius:50%;border:0;border-bottom:8px solid var(--gd);background:var(--g);color:#fff;font-size:36px;font-weight:800;cursor:pointer}
+.lv.cur .nb{background:var(--b);border-bottom-color:var(--bd)}.lv.lock .nb{background:var(--line);border-bottom-color:#c4c4c4;cursor:default}
+.lv small{margin-top:10px;font-weight:800;font-size:14px;text-align:center;color:var(--mut)}
+.bub{position:absolute;top:-34px;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:2px 12px;font-weight:800;font-size:13px;color:var(--b);animation:bob 1s infinite alternate}
+@keyframes bob{to{transform:translateY(-4px)}}
+.xb{border:0;background:none;color:var(--mut);font-size:22px;font-weight:800;cursor:pointer;padding:0 4px}
+.dr{margin:12px 0}.drl{font-weight:800;margin-bottom:2px}.drb{display:flex;gap:8px}
+.dro{flex:1;padding:12px;background:var(--card);color:var(--tx);font:inherit;font-weight:700;font-size:16px;text-align:center;border:2px solid var(--line);border-bottom-width:5px;border-radius:16px;cursor:pointer}
+.dro.sel{border-color:#ff9600;background:var(--hl)}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.mbox{background:var(--card);color:var(--tx);border-radius:20px;max-width:420px;width:100%;padding:20px;max-height:92%;overflow:auto}
+.mbox h2{margin:0 0 10px;font-size:22px}.mg{background:var(--bs);border-radius:12px;padding:10px 12px;margin-bottom:14px;font-weight:700}
+.ml{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--b)}.mbox ul{margin:6px 0 16px;padding-left:20px}.mbox li{margin:6px 0}
+.mx{display:block;margin:10px auto 0;background:none;border:0;color:var(--mut);font:inherit;font-weight:800;cursor:pointer}
+.opt.bad{border-color:var(--r);background:var(--rs);color:var(--rd);animation:shake .3s}.opt.y{border-color:var(--g);background:var(--gs);color:var(--gd)}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.why{margin-top:6px;font-size:15px}.tip{margin-top:6px;font-size:14px;opacity:.85}.foot.ok .why{color:var(--tx);opacity:.85}
+.lk .opt,.lk .chip,.lk .dro,.lk .click{pointer-events:none}
+</style></head><body><div id="app">
+<div id="home"><div class="hd"><span>AC Circuits</span><span class="pill xp" id="xp0"></span></div><div class="path" id="path"></div></div>
+<div id="lesson">
+<div class="top"><button class="xb" id="xb" aria-label="Exit lesson">✕</button><button class="xb" id="ib" aria-label="Lesson goal">ⓘ</button><div class="bar"><i id="pb"></i></div><span class="pill st" id="st">🔥 0</span><span class="pill xp" id="xp">⚡ 0</span></div>
+<div class="scroll" id="sc"><div class="cir" id="cir"></div><div class="work" id="work"></div><div id="qa"></div></div>
+<div class="foot" id="ft"><div class="msg" id="msg"></div><button class="sa" id="sa">Show answer</button><button class="go" id="go" disabled>Check</button></div>
+</div></div>
+<div id="modal"><div class="mbox"><h2 id="mt"></h2><div class="mg" id="mg"></div><div class="ml">Learning objectives</div><ul id="mo"></ul><button class="go" id="mgo">Let’s go</button><button class="mx" id="mx">Not now</button></div></div>
+<script>
+// "@" stands for a LaTeX backslash inside $...$
+const T=s=>String(s).replace(/\$([^$]+)\$/g,(m,x)=>{x=x.replace(/@/g,'\\');try{return window.katex?katex.renderToString(x,{output:'mathml',throwOnError:false}):x}catch(e){return x}});
+const KC1=['$(V_1-V_s)\\,Y_L$','$+$','$(V_1-V_2)\\,Y_R$','$=0$','$(V_1+V_s)\\,Y_L$','$(V_s-V_1)\\,Y_R$'];
+const KC2=['$(V_2-V_1)\\,Y_R$','$+$','$V_2\\,Y_C$','$=0$','$(V_2-V_1)\\,Y_C$','$V_2\\,Y_R$'];
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const mk=s=>{const r=s.gen?Object.assign({},s,s.gen(s)):Object.assign({},s);
+if(Array.isArray(r.o)){const ix=shuf(r.o.map((_,k)=>k));r.o=ix.map(k=>r.o[k]);if(Array.isArray(r.w))r.w=ix.map(k=>r.w[k]);r.a=ix.indexOf(r.a)}
+if(r.build){const ix=shuf(r.build.map((_,k)=>k));if(Array.isArray(r.a))r.a=r.a.map(x=>ix.indexOf(x));r.build=ix.map(k=>r.build[k])}
+return r};
+const enters=(id,n)=>{const B=BR[id],d=DIR[id];return(d===1&&B.b===n)||(d===-1&&B.a===n)};
+function drawArrows(){const g=document.getElementById('arr');if(!g)return;g.innerHTML=Object.keys(DIR).filter(id=>BR[id]&&BR[id].p).map(id=>{const B=BR[id],d=DIR[id],x=B.p[0],y=B.p[1],vx=B.v[0]*d,vy=B.v[1]*d,px=-vy,py=vx,tx=x+vx*11,ty=y+vy*11,sx=x-vx*11,sy=y-vy*11;
+return `<path d="M${sx} ${sy}L${tx} ${ty}M${tx-vx*7+px*4} ${ty-vy*7+py*4}L${tx} ${ty}L${tx-vx*7-px*4} ${ty-vy*7-py*4}" style="stroke:#ff9600;stroke-width:3;fill:none"/><text x="${B.lp[0]}" y="${B.lp[1]}" text-anchor="${B.lp[2]}" style="fill:#ff9600;font-weight:700">I<tspan font-size="10" dy="3">${B.sym}</tspan></text>`}).join('')}
+const dirS=(nd,br,hl,nt='$N_1$')=>({st:'Directions',dir:1,nd,br,nt,hl,q:`Choose the direction of each current at ${nt}. You decide, and the next questions will follow your arrows.`,e:'Any choice works. If the real current flows the other way, its value simply comes out negative.'});
+const kclS=(nd,all,dis,hl,nt='$N_1$')=>({st:'KCL',kcl:1,hl,gen(){const ent=[],lea=[];all.forEach(id=>(enters(id,nd)?ent:lea).push(id));
+const tx=id=>'I_'+BR[id].sym,sy=id=>'$'+tx(id)+'$',bank=[...all,...dis].map(sy).concat(['$+$','$+$','$=$','$0$']);
+const side=a=>a.length?a.map(tx).join('+'):'0',eq=side(ent)+'='+side(lea);
+const jn=a=>a.length?a.flatMap((id,j)=>j?['$+$',sy(id)]:[sy(id)]):['$0$'],seq=[...jn(ent),'$=$',...jn(lea)],used=new Set();
+const ix=seq.map(x=>{const k=bank.findIndex((y,j)=>y===x&&!used.has(j));used.add(k);return k});
+const f=a=>a.filter(x=>x!=='$+$').sort().join('|'),E=f(ent.length?ent.map(sy):['$0$']),O=f(lea.length?lea.map(sy):['$0$']);
+return{q:`Write KCL at ${nt} using your arrows: current entering = current leaving.`,build:bank,a:ix,chk:a=>{const i=a.indexOf('$=$');if(i<0)return false;const L=f(a.slice(0,i)),R=f(a.slice(i+1));return(L===E&&R===O)||(L===O&&R===E)},
+diag:a=>{const i=a.indexOf('$=$');if(i<0)return 'Your equation needs an = sign: entering currents on one side, leaving currents on the other.';
+const need=new Set([...ent,...lea].map(sy)),used=a.filter(x=>x[1]==='I'),ex=used.filter(x=>!need.has(x)),ms=[...need].filter(x=>!used.includes(x));
+if(ex.length)return ex.join(', ')+' does not touch this node, so it does not belong in this equation.';
+if(ms.length)return 'Your equation is missing '+ms.join(', ')+'. Every current at the node must appear once.';
+return 'All the currents are there, but on the wrong sides. Arrows pointing toward the node go on one side, arrows pointing away on the other.'+(ent.length&&lea.length?'':' When every arrow points the same way, the other side is $0$.')},
+h:'Currents entering a node equal currents leaving it. Check your arrows: which ones point toward the node?',e:`Entering = leaving: $${eq}$.`,rec:`$${eq}$`}}});
+const ohmS=(id,hl)=>({st:'Ohm’s law',ohm:id,hl,f:'$I=@dfrac{V_{@mathrm{tail}}-V_{@mathrm{head}}}{Z}$',gen(){const B=BR[id],d=DIR[id],c=d===1?B.ex[0]:B.ex[1],tl=d===1?B.va:B.vb,hd=d===1?B.vb:B.va;
+return{q:`Write $I_${B.sym}$ for your arrow, using Ohm’s law.`,o:[B.ex[0],B.ex[1],...B.dis].map(x=>`$I_${B.sym}=${x}$`),a:d===1?0:1,w:[0,1,2,3].map(j=>j===(d===1?0:1)?'':j===(d===1?1:0)?`That is the expression for the opposite arrow. Yours points from $${tl}$ to $${hd}$, so use tail minus head.`:`Use the voltages at both ends of the branch: $${tl}$ at the tail and $${hd}$ at the head.`),h:`Your arrow points from $${tl}$ to $${hd}$, so the drop is tail minus head.`,e:`$I_${B.sym}=${c}$.`,rec:`$I_${B.sym}=${c}$`}}});
+const $=id=>document.getElementById(id);const P=(()=>{try{const p=JSON.parse(localStorage.getItem('acl'));return{done:p.done||[],xp:p.xp||0}}catch(e){return{done:[],xp:0}}})();
+let S,cs,PP,BR={},DIR={},locked=false,lastWrong=null,cur=0,i=0,xp=P.xp,streak=0,tries=0,sel=null,ans=[],done=false;const qa=$('qa'),go=$('go'),ft=$('ft');
+const hl=l=>document.querySelectorAll('svg g[data-c]').forEach(g=>g.classList.toggle('on',l.includes(g.dataset.c)));
+function render(){const s=cs=mk(S[i]);locked=false;$('lesson').classList.remove('lk');tries=0;sel=null;ans=[];done=false;hl(s.hl);$('pb').style.width=(i/S.length*100)+'%';ft.className='foot';$('sa').style.display='none';go.textContent='Check';go.disabled=true;go.onclick=check;
+document.querySelectorAll('.click').forEach(c=>{c.style.display=s.node?'':'none';c.classList.remove('sel')});
+let h=`<div class="stage">${s.st} · ${i+1}/${S.length}</div><button class="hb" id="hb">💡 Hint</button><div class="q">${T(s.q)}</div>`;
+if(s.f)h+=`<div class="f">${T(s.f)}</div>`;h+=`<div id="hint"></div>`;
+if(s.dir)h+=s.br.map(id=>`<div class="dr"><div class="drl">${T('Direction of $I_'+BR[id].sym+'$')}</div><div class="drb"><button class="dro" data-b="${id}" data-v="in">${T('into '+s.nt)}</button><button class="dro" data-b="${id}" data-v="out">${T('out of '+s.nt)}</button></div></div>`).join('');
+if(s.o)h+=s.o.map((o,k)=>`<button class="opt" data-k="${k}">${T(o)}</button>`).join('');
+if(s.build)h+=`<div class="ans" id="ans"></div><div class="bank">${s.build.map((t,k)=>`<button class="chip" data-k="${k}">${T(t)}</button>`).join('')}</div>`;
+qa.innerHTML=h;$('hb').onclick=()=>{$('hint').innerHTML=`<div class="hint">${T(cs.h)}</div>`};
+qa.querySelectorAll('.dro').forEach(b=>b.onclick=()=>{if(done||locked)return;const id=b.dataset.b,B=BR[id],toward=b.dataset.v==='in';DIR[id]=(toward===(s.nd===B.b))?1:-1;
+b.parentNode.querySelectorAll('.dro').forEach(x=>x.classList.toggle('sel',x===b));drawArrows();go.disabled=!s.br.every(k=>DIR[k])});
+qa.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(done||locked)return;qa.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=+b.dataset.k;go.disabled=false});
+qa.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{if(done||locked)return;ans.push(+b.dataset.k);drawAns()});drawAns();$('sc').scrollTop=0}
+function drawAns(){const s=cs;if(!s.build)return;$('ans').innerHTML=ans.map((k,j)=>`<button class="chip" data-j="${j}">${T(s.build[k])}</button>`).join('');
+$('ans').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{if(done||locked)return;ans.splice(+b.dataset.j,1);drawAns()});
+qa.querySelectorAll('.bank .chip').forEach(b=>b.classList.toggle('used',ans.includes(+b.dataset.k)));go.disabled=ans.length===0}
+function bindClicks(){document.querySelectorAll('.click').forEach(c=>c.onclick=()=>{const s=cs;if(!s.node||done||locked)return;document.querySelectorAll('.click').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');sel=c.dataset.n;go.disabled=false});}
+function check(){const s=cs;const ok=s.dir?true:s.build?(s.chk?s.chk(ans.map(k=>s.build[k])):(ans.length===s.a.length&&ans.every((k,j)=>k===s.a[j]))):sel===s.a;ok?good(true):bad()}
+function good(real){const s=cs;done=true;if(real){xp+=tries?5:10;streak++}else streak=0;$('xp').textContent='⚡ '+xp;$('st').textContent='🔥 '+streak;
+if(s.o)qa.querySelectorAll('.opt').forEach((b,k)=>{b.classList.toggle('x',k!==s.a);if(k===s.a){b.classList.remove('sel');b.classList.add('y')}});
+if(s.rec){const w=$('work');if(!w.dataset.f){w.innerHTML='';w.dataset.f=1}w.insertAdjacentHTML('beforeend',`<span>${T(s.rec)}</span>`);w.scrollLeft=1e4}
+(s.lbl||[]).forEach(([id,t])=>$(id).textContent=t);if(s.after)s.after();
+ft.className='foot ok';$('msg').innerHTML=`<b>${real?['Nice!','Correct!','Great job!','You got it!'][i%4]:'Here’s the answer'}</b>${T(s.e)}${real&&!tries&&Array.isArray(s.w)&&s.w.find(Boolean)?`<div class="why">⚠ Common slip: ${T(s.w.find(Boolean))}</div>`:''}`;$('sa').style.display='none';
+go.textContent=i===S.length-1?'Finish':'Continue';go.disabled=false;go.onclick=next}
+function bad(){lastWrong=sel;locked=true;$('lesson').classList.add('lk');tries++;streak=0;$('st').textContent='🔥 0';ft.className='foot no';const s=cs;
+let why='';if(s.w&&sel!==null&&sel!==undefined)why=s.w[sel]||'';else if(s.build){const g=ans.map(k=>s.build[k]);if(s.diag)why=s.diag(g);else{const nd=s.a.map(k=>s.build[k]),ex=g.filter(x=>!nd.includes(x)),ms=nd.filter(x=>!g.includes(x));why=ex.length?ex.join(' ')+' does not belong in this equation.':ms.length?'Still missing: '+ms.join(' ')+'.':'You have the right pieces, but the order is off. Read the equation left to right.'}}
+if(s.o&&sel!==null){const b=qa.querySelectorAll('.opt')[sel];if(b)b.classList.add('bad')}
+$('msg').innerHTML=`<b>${tries>1?'Still not it':'Not quite'}</b>${why?`<div class="why">${T(why)}</div>`:''}<div class="tip">💡 ${T(s.h)}</div>`;go.textContent='Try again';go.onclick=retry;
+if(tries>=2){$('sa').style.display='block';$('sa').onclick=()=>{if(s.build)ans=s.a.slice();else sel=s.a;good(false)}}}
+function retry(){const s=cs;locked=false;$('lesson').classList.remove('lk');ft.className='foot';$('sa').style.display='none';go.textContent='Check';go.onclick=check;
+if(s.o){qa.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));const b=qa.querySelectorAll('.opt')[lastWrong];if(b){b.classList.remove('bad');b.classList.add('x');b.disabled=true}sel=null;go.disabled=true}
+else if(s.build){ans=[];drawAns()}else{document.querySelectorAll('.click').forEach(x=>x.classList.remove('sel'));sel=null;go.disabled=true}}
+function next(){i++;if(i>=S.length){$('pb').style.width='100%';hl([]);ft.className='foot';$('msg').innerHTML='';go.textContent='Back to path';go.disabled=false;go.onclick=finishLevel;
+qa.innerHTML=`<div class="big"><div style="font-size:64px">🎉</div><h2>Level complete!</h2><p>${LV[cur].done(PP).map(T).join('<br>')}</p><p class="pill xp">⚡ ${xp} XP earned</p></div>`;return}render()}
+
+const SVG1=`<svg viewBox="0 0 440 200" role="img" aria-label="Schematic: AC source, inductor, resistor, capacitor to ground">
+<path d="M40 55H80M136 55H215M285 55H340M340 55V98M340 110V175M40 55V83M40 127V175M40 175H340"/>
+<g data-c="S"><circle class="s" cx="40" cy="105" r="22"/><path d="M29 105q5.5-11 11 0t11 0"/></g>
+<path d="M30 70h8M34 66v8M28 140h8"/>
+<g data-c="L"><path d="M80 55a7 7 0 0 1 14 0a7 7 0 0 1 14 0a7 7 0 0 1 14 0a7 7 0 0 1 14 0"/></g>
+<g data-c="R"><path d="M215 55h5l5-9 10 18 10-18 10 18 10-18 5 9h15"/></g>
+<g data-c="C"><path d="M326 98H354M326 110H354"/></g>
+<g id="gnd" style="display:none"><path d="M180 175V181M166 181H194M171 187H189M176 193H184"/></g>
+<text class="m u" x="108" y="34" text-anchor="middle">L = §L§</text>
+<text class="v" x="108" y="78" text-anchor="middle" id="zL"></text><text class="v" x="108" y="94" text-anchor="middle" id="yL"></text>
+<text class="m u" x="250" y="34" text-anchor="middle">R = §R§</text>
+<text class="m u" x="364" y="102">C = §C§</text><text class="v" x="364" y="120" id="zC"></text><text class="v" x="364" y="136" id="yC"></text>
+<text class="m" x="62" y="152">V<tspan font-size="10" dy="3">s</tspan><tspan dy="-3" class="u"> = §A§∠0° V</tspan></text>
+<text x="180" y="40" text-anchor="middle">V<tspan font-size="10" dy="3">1</tspan></text><text x="340" y="40" text-anchor="middle">V<tspan font-size="10" dy="3">2</tspan></text>
+<text class="m u" x="180" y="73" text-anchor="middle" font-size="11">N1</text><text class="m u" x="352" y="73" text-anchor="start" font-size="11">N2</text>
+<text class="u" x="322" y="94" text-anchor="end">+</text><text class="u" x="322" y="124" text-anchor="end">−</text>
+<text class="m" x="372" y="156">V<tspan font-size="10" dy="3">out</tspan><tspan dy="-3" class="u"> = V</tspan><tspan font-size="10" dy="3">2</tspan></text>
+<text class="v" x="180" y="128" text-anchor="middle" id="v1"></text><text class="v" x="328" y="150" text-anchor="end" id="v2"></text>
+<circle class="nd" cx="40" cy="55" r="4"/><circle class="nd" cx="180" cy="55" r="4"/><circle class="nd" cx="340" cy="55" r="4"/><circle class="nd" cx="180" cy="175" r="4"/>
+<circle class="click" data-n="s" cx="40" cy="55" r="13"/><circle class="click" data-n="g" cx="180" cy="175" r="13"/><circle class="click" data-n="n1" cx="180" cy="55" r="13"/><circle class="click" data-n="n2" cx="340" cy="55" r="13"/>
+</svg>`,SVG2=`<svg viewBox="0 0 440 200" role="img" aria-label="Schematic: source, resistor, capacitor and dependent current source">
+<path d="M40 55H80M140 55H300M300 55V95M300 135V175M40 55V83M40 127V175M40 175H300M190 55V98M190 110V175"/>
+<g data-c="S"><circle class="s" cx="40" cy="105" r="22"/><path d="M29 105q5.5-11 11 0t11 0"/></g><path d="M30 70h8M34 66v8M28 140h8"/>
+<g data-c="R"><path d="M80 55h5l5-9 10 18 10-18 10 18 10-18 5 9h5"/></g>
+<g data-c="C"><path d="M176 98H204M176 110H204"/></g>
+<g data-c="D"><path d="M300 95l16 20-16 20-16-20z"/><path d="M300 127V104M294 111l6-8 6 8"/></g>
+<text class="m u" x="110" y="34" text-anchor="middle">R = §R§</text>
+<text class="m u" x="212" y="102">C = §C§</text><text class="v" x="212" y="120" id="yC"></text>
+<text class="m" x="326" y="108">I<tspan font-size="10" dy="3">d</tspan><tspan dy="-3" class="u"> = g·V</tspan><tspan font-size="10" dy="3">x</tspan></text><text class="m u" x="326" y="126">g = §G§ mS</text>
+<text class="u" x="172" y="94" text-anchor="end">+</text><text class="u" x="172" y="124" text-anchor="end">−</text>
+<text class="m" x="168" y="112" text-anchor="end">V<tspan font-size="10" dy="3">x</tspan></text>
+<text class="m" x="62" y="152">V<tspan font-size="10" dy="3">s</tspan><tspan dy="-3" class="u"> = §A§∠0° V</tspan></text>
+<text x="190" y="40" text-anchor="middle">V<tspan font-size="10" dy="3">1</tspan></text>
+<text class="v" x="245" y="158" text-anchor="middle" id="v1"></text>
+<circle class="nd" cx="40" cy="55" r="4"/><circle class="nd" cx="190" cy="55" r="4"/><circle class="nd" cx="190" cy="175" r="4"/>
+</svg>`,SVG3=`<svg viewBox="0 0 440 200" role="img" aria-label="Schematic: inverting op-amp with capacitor feedback">
+<path d="M40 60H80M140 60H240M190 60V25H270M280 25H365V80H330M240 100H215V175M40 60V83M40 127V175M40 175H215M130 175V181M116 181H144M121 187H139M126 193H134"/>
+<g data-c="S"><circle class="s" cx="40" cy="105" r="22"/><path d="M29 105q5.5-11 11 0t11 0"/></g><path d="M30 70h8M34 66v8M28 140h8"/>
+<g data-c="R"><path d="M80 60h5l5-9 10 18 10-18 10 18 10-18 5 9h5"/></g>
+<g data-c="C"><path d="M270 15V35M280 15V35"/></g>
+<g data-c="O"><path d="M240 40V120L330 80Z"/></g>
+<text class="u" x="246" y="65">−</text><text class="u" x="246" y="105">+</text>
+<text class="m u" x="110" y="40" text-anchor="middle">R = §R§</text><text class="m u" x="275" y="9" text-anchor="middle">C = §C§</text>
+<text class="m" x="62" y="152">V<tspan font-size="10" dy="3">in</tspan><tspan dy="-3" class="u"> = §A§∠0° V</tspan></text>
+<text class="m" x="372" y="100">V<tspan font-size="10" dy="3">out</tspan></text><text class="v" x="432" y="130" text-anchor="end" id="vo"></text>
+<circle class="nd" cx="40" cy="60" r="4"/><circle class="nd" cx="190" cy="60" r="4"/><circle class="nd" cx="365" cy="80" r="4"/>
+</svg>`,SVG4=`<svg viewBox="0 0 440 200" role="img" aria-label="Schematic: magnetically coupled coils with dot convention">
+<path d="M40 55H160V65M200 55H290V65M290 115V175M40 175H290M160 129V175M200 55V65M200 129V175M40 55V83M40 127V175"/>
+<g data-c="S"><circle class="s" cx="40" cy="105" r="22"/><path d="M29 105q5.5-11 11 0t11 0"/></g><path d="M30 70h8M34 66v8M28 140h8"/>
+<g data-c="L1"><path d="M160 65a8 8 0 0 1 0 16a8 8 0 0 1 0 16a8 8 0 0 1 0 16a8 8 0 0 1 0 16"/></g>
+<g data-c="L2"><path d="M200 65a8 8 0 0 0 0 16a8 8 0 0 0 0 16a8 8 0 0 0 0 16a8 8 0 0 0 0 16"/></g>
+<g data-c="M"><path d="M176 60V135M184 60V135"/></g>
+<g data-c="R"><path d="M290 65v5l-9 5 18 10-18 10 18 10-9 5v5"/></g>
+<circle class="nd" cx="150" cy="70" r="3.5"/><circle class="nd" cx="210" cy="124" r="3.5"/>
+<text class="m u" x="148" y="104" text-anchor="end" font-size="13">L₁ = §L1§</text><text class="m u" x="214" y="104" font-size="13">L₂ = §L2§</text>
+<text class="m u" x="180" y="44" text-anchor="middle" font-size="13">M = §M§</text><text class="m u" x="306" y="95" font-size="13">R = §R§</text>
+<text class="u" x="100" y="120" text-anchor="middle">I₁ ↻</text><text class="u" x="245" y="130" text-anchor="middle">I₂ ↻</text>
+<text class="m" x="62" y="152">V<tspan font-size="10" dy="3">s</tspan><tspan dy="-3" class="u"> = §A§∠0° V</tspan></text>
+<text class="v" x="306" y="150" id="vo"></text>
+</svg>`;
+const KD=['$(V_1-V_s)@,Y_R$','$+$','$V_1@,Y_C$','$-$','$g@,V_x$','$=0$','$(V_s-V_1)@,Y_R$','$V_x@,Y_C$'];
+const KO=['$@dfrac{V_{in}-0}{R}$','$=$','$@dfrac{0-V_{out}}{Z_f}$','$@dfrac{V_{out}-0}{Z_f}$','$@dfrac{V_{in}+V_{out}}{R}$'];
+const KM1=['$j@omega L_1 I_1$','$+$','$j@omega M I_2$','$=V_s$','$j@omega M I_1$','$-$'];
+const KM2=['$j@omega M I_1$','$+$','$(R+j@omega L_2)I_2$','$=0$','$(R+j@omega L_1)I_2$','$j@omega M I_2$'];
+const BR1={L:{sym:'L',a:'S',b:'N1',va:'V_s',vb:'V_1',ex:['(V_s-V_1)@,Y_L','(V_1-V_s)@,Y_L'],dis:['(V_s+V_1)@,Y_L','V_1@,Y_L'],p:[158,55],v:[1,0],lp:[158,44,'middle']},
+R:{sym:'R',a:'N1',b:'N2',va:'V_1',vb:'V_2',ex:['(V_1-V_2)@,Y_R','(V_2-V_1)@,Y_R'],dis:['(V_1+V_2)@,Y_R','V_1@,Y_R'],p:[312,55],v:[1,0],lp:[312,44,'middle']},
+C:{sym:'C',a:'N2',b:'G',va:'V_2',vb:'0',ex:['V_2@,Y_C','-V_2@,Y_C'],dis:['(V_2-V_s)@,Y_C','V_1@,Y_C'],p:[340,160],v:[0,1],lp:[330,166,'end']}};
+const BR2={R:{sym:'R',a:'S',b:'N1',va:'V_s',vb:'V_1',ex:['(V_s-V_1)@,Y_R','(V_1-V_s)@,Y_R'],dis:['(V_s+V_1)@,Y_R','V_1@,Y_R'],p:[165,55],v:[1,0],lp:[165,44,'middle']},
+C:{sym:'C',a:'N1',b:'G',va:'V_1',vb:'0',ex:['V_1@,Y_C','-V_1@,Y_C'],dis:['(V_1-V_s)@,Y_C','V_s@,Y_C'],p:[190,142],v:[0,1],lp:[180,146,'end']},
+D:{sym:'d',a:'G',b:'N1',fix:1}};
+const BR3={R:{sym:'R',a:'S',b:'N1',va:'V_{in}',vb:'0',ex:['@dfrac{V_{in}}{R}','-@dfrac{V_{in}}{R}'],dis:['@dfrac{V_{in}+V_{out}}{R}','@dfrac{V_{out}}{R}'],p:[165,60],v:[1,0],lp:[165,49,'middle']},
+F:{sym:'f',a:'N1',b:'O',va:'0',vb:'V_{out}',ex:['@dfrac{0-V_{out}}{Z_f}','@dfrac{V_{out}-0}{Z_f}'],dis:['@dfrac{V_{in}-V_{out}}{Z_f}','@dfrac{V_{out}}{R}'],p:[325,25],v:[1,0],lp:[325,12,'middle']}};
+const E='';
+const R2=x=>{const r=Math.round(x*100)/100;return Object.is(r,-0)?0:r};
+const n=x=>String(R2(x)),g3=x=>String(Number(x.toPrecision(3)));
+const C={sub:(a,b)=>[a[0]-b[0],a[1]-b[1]],mul:(a,b)=>[a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]],div:(a,b)=>{const d=b[0]*b[0]+b[1]*b[1];return[(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d]},conj:a=>[a[0],-a[1]],neg:a=>[-a[0],-a[1]],abs:a=>Math.hypot(a[0],a[1]),arg:a=>Math.atan2(a[1],a[0])*180/Math.PI};
+const ang=z=>{const a=R2(C.arg(z));return a===-180?180:a};
+const cx=z=>{const r=R2(z[0]),i=R2(z[1]),ja=a=>Math.abs(a)===1?'j':'j'+Math.abs(a);if(!r&&!i)return'0';if(!i)return n(r);if(!r)return(i<0?'-':'')+ja(i);return n(r)+(i<0?'-':'+')+ja(i)};
+const pol=z=>n(C.abs(z))+'@angle'+n(ang(z))+'^@circ';
+const U={O:'@,@Omega',mS:'@,@mathrm{mS}',V:'@,@mathrm{V}',mA:'@,@mathrm{mA}',n:''};
+const fr=u=>z=>'$'+cx(z)+U[u]+'$',fp=u=>z=>'$'+pol(z)+U[u]+'$';
+const pl=z=>cx(z).replace(/-/g,'−'),plp=z=>n(C.abs(z))+'∠'+n(ang(z))+'° V';
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function opts(c,ws,fm,fb){const o=[fm(c)],w=[E],seen=new Set(o);
+for(const[v,y]of ws){const s=fm(v);if(!seen.has(s)){seen.add(s);o.push(s);w.push(y)}if(o.length>3)break}
+for(let k=2;o.length<4;k++){const[v,y]=fb?fb(k):[[c[0]*k,c[1]*k],'The size is off. Redo the arithmetic step by step.'],s=fm(v);if(!seen.has(s)){seen.add(s);o.push(s);w.push(y)}}
+return{o,w,a:0}}
+const mc=(b,c,ws,fm,fb)=>({...b,...opts(c,ws,fm,fb)});
+const tdom=(M,th,w)=>'$'+n(M)+'@cos('+w+'t'+(th>0?'+':th<0?'-':'')+(th?n(Math.abs(th))+'^@circ':'')+')$';
+const gen1=()=>{const w=pick([500,1000,2000]),XL=pick([50,100,200]),R=pick([50,100,200]),XC=pick([50,100,200]),A=pick([10,20]);return{w,XL,R,XC,A,tx:{L:n(1000*XL/w)+' mH',R:R+' Ω',C:n(1e6/(w*XC))+' µF',A:String(A)}}};
+const gen2=()=>{const w=pick([500,1000,2000]),R=pick([50,100,200]),XC=pick([50,100,200]),A=pick([10,20]),g=pick([5,10,15,20]);return{w,R,XC,A,g,tx:{R:R+' Ω',C:n(1e6/(w*XC))+' µF',A:String(A),G:String(g)}}};
+const gen3=()=>{const w=pick([500,1000,2000]),R=pick([50,100,200]),XC=pick([50,100,200]),Vm=pick([2,4,5,10]);return{w,R,XC,Vm,tx:{R:R+' Ω',C:n(1e6/(w*XC))+' µF',A:String(Vm)}}};
+const gen4=()=>{const w=pick([500,1000,2000]),XL1=pick([100,200]),XL2=pick([100,200]),XM=pick([50,100]),R=pick([50,100,200]),A=pick([10,20]);return{w,XL1,XL2,XM,R,A,tx:{L1:n(1000*XL1/w)+' mH',L2:n(1000*XL2/w)+' mH',M:n(1000*XM/w)+' mH',R:R+' Ω',A:String(A)}}};
+const S1=P=>{const{w,XL,R,XC,A}=P,Yl=1000/XL,Yr=1000/R,Yc=1000/XC,Lh=XL/w,Cuf=1e6/(w*XC),wC=1/XC;
+const ZL=[0,XL],YL=[0,-Yl],YC=[0,Yc],a=[Yr,-Yl],rhs=[0,-Yl*A],k=[1,Yc/Yr],cc=C.sub(C.mul(a,k),[Yr,0]),V2=C.div(rhs,cc),V1=C.mul(k,V2),d=C.sub(V2,V1),t2=C.mul(V2,[0,Yc]);
+P.res=['$V_{out}='+pol(V2)+U.V+'$','$v(t)='+tdom(C.abs(V2),ang(V2),w).slice(1)];
+return[
+{st:'Understand',q:'Which parts have impedance that changes with frequency?',o:['Only $R$','$L$ and $C$','$R$ and $L$','All three'],a:1,hl:['L','C'],h:'$R$ is just $'+R+'@,@Omega$ at any frequency. $L$ and $C$ are the reactive parts.',e:'$Z_R=R$ is fixed. $Z_L=j@omega L$ and $Z_C=@dfrac{1}{j@omega C}$ depend on $@omega$.',w:['$R$ is constant: $Z_R=R$ at every frequency, so it cannot be the one that changes.',E,'$L$ does change, but $C$ also depends on $@omega$ through $Z_C=1/(j@omega C)$.','$R$ stays $'+R+'@,@Omega$ at any frequency, so it is not frequency-dependent.']},
+mc({st:'Understand',q:'The source is $v_s='+A+'@cos('+w+'t)@,@mathrm{V}$. What is $@omega$ in rad/s?',f:'$v=V_m@cos(@omega t)$',hl:['S'],h:'$@omega$ is the number multiplying $t$.',e:'$@omega='+w+'@,@mathrm{rad/s}$. Everything else is built from this.',rec:'$@omega='+w+'$'},w,[[A,'$'+A+'$ is the amplitude (peak volts), not the angular frequency.'],[Math.round(w/6.2832),'$'+Math.round(w/6.2832)+'$ is a frequency in Hz ($@omega/2@pi$). Here $@omega$ is read straight off the cosine.'],[2*w,'Check the cosine again: the number multiplying $t$ is $'+w+'$, not $'+2*w+'$.']],x=>'$'+x+'$'),
+mc({st:'Impedance',q:'Find $Z_L$ ($L='+n(1000*Lh)+'@,@mathrm{mH}$, $@omega='+w+'$).',f:'$Z_L=j@omega L$',hl:['L'],h:'$@omega L='+w+'@times'+g3(Lh)+'='+XL+'$. An inductor is $+j$.',e:'$Z_L=j@cdot'+w+'@cdot'+g3(Lh)+'=j'+XL+'@,@Omega$.',rec:'$Z_L='+cx(ZL)+'@,@Omega$',lbl:[['zL','Z = '+pl(ZL)+' Ω']]},ZL,[[[0,XL/10],'Arithmetic slip: $@omega L='+w+'@times'+g3(Lh)+'='+XL+'$, not $'+XL/10+'$.'],[[0,-XL],'An inductor gives $+j$. The minus sign belongs to capacitors.'],[[XL,0],'$Z_L$ is purely reactive, so it must carry a $j$.']],fr('O')),
+mc({st:'Impedance',q:'Find $Z_C$ ($C='+n(Cuf)+'@,@mu@mathrm{F}$, $@omega='+w+'$).',f:'$Z_C=@dfrac{1}{j@omega C}$',hl:['C'],h:'$@omega C='+g3(wC)+'$, then $1/'+g3(wC)+'='+XC+'$. A capacitor is $-j$.',e:'$Z_C=@dfrac{1}{j('+g3(wC)+')}=-j'+XC+'@,@Omega$.',rec:'$Z_C=-j'+XC+'@,@Omega$',lbl:[['zC','Z = −j'+XC+' Ω']]},[0,-XC],[[[0,XC],'A capacitor is $-j$, not $+j$, because $1/j=-j$.'],[[0,-XC/10],'Check $@omega C=1/'+XC+'$; then take the reciprocal: $'+XC+'$, not $'+XC/10+'$.'],[[0,-wC],'$'+g3(wC)+'$ is $@omega C$ (admittance size). $Z_C$ is its reciprocal: $'+XC+'$.']],fr('O')),
+{st:'Set up',q:'Tap the reference (ground) node on the circuit.',node:1,a:'g',hl:[],h:'Pick the bottom rail that the source and capacitor both return to.',e:'The bottom rail is $0@,@mathrm{V}$. That leaves $V_1$ and $V_2$ as unknowns.',rec:'Ground = bottom rail',after:()=>$('gnd').style.display='',w:{s:'That is the source node. It is already fixed at $V_s$, so it is not the $0@,@mathrm{V}$ reference.',n1:'$N_1$ is an unknown node voltage, so it cannot be the reference.',n2:'$N_2$ is the output node with an unknown voltage, so it cannot be the reference.'}},
+{st:'Set up',q:'How many unknown node voltages are there?',o:['$1$','$2$','$3$','$4$'],a:1,hl:[],h:'Count nodes that are neither ground nor fixed by the source.',e:'$V_1$ and $V_2$, so we need two KCL equations.',rec:'Unknowns: $V_1,V_2$',w:['$N_1$ and $N_2$ are both unknown, so one equation is not enough.',E,'Ground is fixed at $0@,@mathrm{V}$ and the source node is fixed by $V_s$. Only $N_1$ and $N_2$ remain.','Count only nodes that are neither ground nor fixed by the source. That is two.']},
+mc({st:'Admittance',q:'Find $Y_L=1/Z_L$ in millisiemens.',f:'$Y=@dfrac{1}{Z}$',hl:['L'],h:'$@dfrac{1}{j'+XL+'}=-j'+g3(1/XL)+'@,@mathrm{S}$. Multiply by 1000 for mS.',e:'$Y_L='+cx(YL)+'@,@mathrm{mS}$.',rec:'$Y_L='+cx(YL)+'@,@mathrm{mS}$',lbl:[['yL','Y = '+pl(YL)+' mS']]},YL,[[[0,Yl],'$1/(j'+XL+')=-j/'+XL+'$ because $1/j=-j$. The sign is negative for an inductor.'],[[0,-XL],'$Y$ is the reciprocal of $Z$, so it is not just $'+XL+'$.'],[[Yl,0],'An inductor’s admittance is imaginary, so keep the $j$.']],fr('mS')),
+mc({st:'Admittance',q:'Find $Y_C=1/Z_C$ in mS. (Given $Y_R='+n(Yr)+'@,@mathrm{mS}$)',f:'$Y=@dfrac{1}{Z}$',hl:['C'],h:'$@dfrac{1}{-j'+XC+'}=+j'+g3(1/XC)+'@,@mathrm{S}$.',e:'$Y_C='+cx(YC)+'@,@mathrm{mS}$.',rec:'$Y_C='+cx(YC)+'@,@mathrm{mS}$',lbl:[['yC','Y = '+pl(YC)+' mS']]},YC,[[[0,-Yc],'$Z_C=-j'+XC+'$, so $1/(-j'+XC+')=+j/'+XC+'$. The sign flips because $1/(-j)=j$.'],[[0,XC],'$Y$ is the reciprocal of $Z$, so it is not just $'+XC+'$.'],[[Yc,0],'A capacitor’s admittance is imaginary ($j@omega C$), so keep the $j$.']],fr('mS')),
+dirS('N1',['L','R'],['L','R']),kclS('N1',['L','R'],['C'],['L','R']),ohmS('L',['L']),ohmS('R',['R']),
+mc({st:'KCL at N1',q:'Substitute and collect the $V_1$ terms. What is the coefficient $Y_L+Y_R$?',f:'$('+cx(YL)+')+'+n(Yr)+'$',hl:['L','R'],h:'Add real parts and imaginary parts separately.',e:'$N_1$: $('+cx(a)+')V_1-'+n(Yr)+'V_2='+cx(rhs)+'$.',rec:'$('+cx(a)+')V_1-'+n(Yr)+'V_2='+cx(rhs)+'$'},a,[[[Yr,Yl],'$Y_L='+cx(YL)+'$, so the imaginary part is negative.'],[YL,'You dropped $Y_R='+n(Yr)+'$. The sum is $'+n(Yr)+'+('+cx(YL)+')$.'],[[Yr+Yl,0],'Real and imaginary parts do not merge into one real number.']],fr('mS')),
+dirS('N2',['C'],['R','C'],'$N_2$'),kclS('N2',['R','C'],['L'],['R','C'],'$N_2$'),ohmS('C',['C']),
+mc({st:'Solve',q:'Collecting terms at $N_2$ gives $-'+n(Yr)+'V_1+('+cx([Yr,Yc])+')V_2=0$. So $V_1=k@,V_2$. Find $k=@dfrac{Y_R+Y_C}{Y_R}$.',f:'$@dfrac{'+cx([Yr,Yc])+'}{'+n(Yr)+'}$',hl:['R','C'],h:'Divide both parts by $'+n(Yr)+'$.',e:'$k='+cx(k)+'$, so $V_1=('+cx(k)+')V_2$.',rec:'$V_1=('+cx(k)+')V_2$'},k,[[C.conj(k),'$Y_C$ is positive imaginary, so the imaginary part of $k$ is positive.'],[[0,Yc/Yr],'Divide both parts: the real part $'+n(Yr)+'/'+n(Yr)+'=1$ stays.'],[C.div([Yr,0],[Yr,Yc]),'You inverted it. $k$ is $(Y_R+Y_C)/Y_R$, with $Y_R$ on the bottom.']],fr('n')),
+mc({st:'Solve',q:'Substitute $V_1=k@,V_2$ into the $N_1$ equation and solve for $V_2$.',f:'$('+cx(a)+')('+cx(k)+')-'+n(Yr)+'='+cx(cc)+'$',hl:['C'],h:'$('+cx(cc)+')V_2='+cx(rhs)+'$, so $V_2=@dfrac{'+cx(rhs)+'}{'+cx(cc)+'}$.',e:'$V_2='+cx(V2)+'='+pol(V2)+'@,@mathrm{V}$. Then $V_1='+pol(V1)+'@,@mathrm{V}$.',rec:'$V_2='+pol(V2)+'$ V',lbl:[['v2','V₂ = '+plp(V2)],['v1','V₁ = '+plp(V1)]]},V2,[[V1,'That is $V_1$. You multiplied by $k$ once too often.'],[C.conj(V2),'Check the sign of the imaginary part when you divide.'],[C.neg(V2),'Check the overall sign of the division.']],fr('V')),
+mc({st:'Finish',q:'Write the output voltage $v_{out}(t)$ at $@omega='+w+'$.',f:'$v=|V|@cos(@omega t+@theta)$',hl:['C'],h:'Magnitude $'+n(C.abs(V2))+'$, angle $'+n(ang(V2))+'^@circ$.',e:'$v_{out}(t)='+tdom(C.abs(V2),ang(V2),w).slice(1)+'@,@mathrm{V}$.',rec:'$v_{out}='+tdom(C.abs(V2),ang(V2),w).slice(1)+'$ V'},tdom(C.abs(V2),ang(V2),w),[[tdom(C.abs(V2),-ang(V2),w),'The phase sign is flipped: the angle of $V_2$ is $'+n(ang(V2))+'^@circ$.'],[tdom(C.abs(V1),ang(V1),w),'That is $V_1$, not the output $V_2$.'],[tdom(C.abs(V2),0,w),'$V_2$ has a phase angle, so the cosine needs a shift.']],x=>x,k=>[tdom(C.abs(V2)*k,ang(V2),w),'The magnitude is off.']),
+mc({st:'Verify',q:'Quick check at $N_2$: $(V_2-V_1)@cdot'+n(Yr)+'+V_2@cdot j'+n(Yc)+'=@;?$',f:'$V_2-V_1='+cx(d)+',@;V_2@,j'+n(Yc)+'='+cx(t2)+'$',hl:[],h:'Multiply the first term by $'+n(Yr)+'$, then add the second term.',e:'$'+cx(C.mul(d,[Yr,0]))+'+('+cx(t2)+')=0$ ✓',rec:'Checked ✓'},[0,0],[[C.mul(d,[Yr,0]),'That is only the first term. Add $V_2@,j'+n(Yc)+'$ as well.'],[t2,'That is only the second term. Add $(V_2-V_1)@cdot'+n(Yr)+'$ as well.'],[C.sub(C.mul(d,[Yr,0]),t2),'You subtracted the second term. KCL adds the currents.']],fr('n'))
+]};
+const S2=P=>{const{w,R,XC,A,g}=P,Yr=1000/R,Yc=1000/XC,Cuf=1e6/(w*XC),wC=1/XC,coef=[Yr-g,Yc],rhs=Yr*A,V1=C.div([rhs,0],coef),nod=C.div([rhs,0],[Yr,Yc]);
+P.res=['$V_1='+pol(V1)+U.V+'$'];
+return[
+{st:'Dependent source',q:'The current source is $I_d=g@,V_x$ with $g='+g+'@,@mathrm{mS}$. What controls $I_d$?',o:['The voltage $V_x$ across $C$','The source $V_s$','The current through $R$','Nothing, it is independent'],a:0,hl:['D','C'],h:'A dependent source follows some other voltage or current in the circuit. Look at the $+/-$ marks.',e:'$V_x$ is the voltage across $C$, so $I_d=g@,V_x$ changes with it.',rec:'$I_d='+g+'V_x$',w:[E,'$V_s$ is the independent source. The label $I_d=g@,V_x$ names $V_x$ as the control.','The label names a voltage $V_x$, not a current through $R$.','It is written $I_d=g@,V_x$, so it depends on $V_x$. That is what makes it dependent.']},
+mc({st:'Admittances',q:'Find $Y_C$ ($C='+n(Cuf)+'@,@mu@mathrm{F}$, $@omega='+w+'$).',f:'$Y_C=j@omega C$',hl:['C'],h:'$@omega C='+g3(wC)+'@,@mathrm{S}='+n(Yc)+'@,@mathrm{mS}$.',e:'$Y_C=j'+n(Yc)+'@,@mathrm{mS}$. Also $Y_R=1/'+R+'='+n(Yr)+'@,@mathrm{mS}$.',rec:'$Y_C=j'+n(Yc)+'$, $Y_R='+n(Yr)+'$ mS',lbl:[['yC','Y = j'+n(Yc)+' mS']]},[0,Yc],[[[0,-Yc],'$Y_C=j@omega C$ is positive imaginary: a capacitor gives $+j$ in admittance.'],[[0,XC],'$Y$ is not $X_C$. Compute $@omega C$, then convert to mS.'],[[Yc,0],'A capacitor’s admittance is imaginary, not a real number.']],fr('mS')),
+{st:'Control variable',q:'Write $V_x$ in terms of the node voltage.',f:'$C$ connects $N_1$ to ground',o:['$V_x=V_1$','$V_x=V_1-V_s$','$V_x=V_s$','$V_x=-V_1$'],a:0,hl:['C'],h:'$C$ goes from $N_1$ to ground ($0@,@mathrm{V}$), so the voltage across it is just $V_1$.',e:'$V_x=V_1$. This turns the dependent source into a term in $V_1$.',rec:'$V_x=V_1$',w:[E,'$V_1-V_s$ would be the drop across $R$, not across $C$.','$V_s$ is across $R$ and $C$ together, not $C$ alone.','$C$ goes from $N_1$ to ground, so the drop is $V_1-0=V_1$. Check the $+$ mark at the $N_1$ side.']},
+dirS('N1',['R','C'],['R','C','D']),kclS('N1',['R','C','D'],[],['R','C','D']),ohmS('R',['R']),ohmS('C',['C']),
+mc({st:'Combine',q:'Substitute $I_R$, $I_C$ and $I_d=g@,V_1$ ($g='+g+'@,@mathrm{mS}$), then collect $V_1$. What is $Y_R+Y_C-g$?',f:'$'+n(Yr)+'+j'+n(Yc)+'-'+g+'$',hl:['R','C','D'],h:'Subtract $g$ from the real part only.',e:'$(Y_R+Y_C-g)V_1=Y_R V_s$ becomes $('+cx(coef)+')V_1='+n(rhs)+'$.',rec:'$('+cx(coef)+')V_1='+n(rhs)+'$'},coef,[[[Yr+g,Yc],'That adds $g$. The dependent source is injected into the node, so it subtracts.'],[[Yr,Yc],'You left out $g$. The dependent source term $-gV_1$ changes the coefficient.'],[[Yr-g,0],'Only the real parts combine with $g$. The $j'+n(Yc)+'$ from $Y_C$ stays.']],fr('mS')),
+mc({st:'Solve',q:'Solve $('+cx(coef)+')V_1='+n(rhs)+'$ for $V_1$.',f:'$V_1=@dfrac{'+n(rhs)+'}{'+cx(coef)+'}$',hl:['C'],h:'Divide the right side by the complex coefficient: multiply top and bottom by its conjugate.',e:'$V_1='+cx(V1)+'@,@mathrm{V}$.',rec:'$V_1='+pol(V1)+'$ V',lbl:[['v1','V₁ = '+plp(V1)]]},V1,[[nod,'That ignores the dependent source: it divides by $Y_R+Y_C$ only.'],[C.conj(V1),'Check the sign of the imaginary part when you divide.'],[C.neg(V1),'Check the overall sign of the division.']],fr('V')),
+mc({st:'Polar form',q:'Write $V_1$ in polar form.',hl:[],h:'Magnitude $@sqrt{a^2+b^2}$ and angle $@arctan(b/a)$ for $a+jb$.',e:'$V_1='+pol(V1)+'@,@mathrm{V}$. Without the dependent source it would be $'+pol(nod)+'$.',rec:'$V_1='+pol(V1)+'$ V'},V1,[[C.conj(V1),'The angle sign is flipped: check the sign of the imaginary part.'],[nod,'That is the answer without the dependent source.'],[[(Math.abs(V1[0])+Math.abs(V1[1]))*Math.cos(C.arg(V1)),(Math.abs(V1[0])+Math.abs(V1[1]))*Math.sin(C.arg(V1))],'The magnitude is $@sqrt{a^2+b^2}$, not $|a|+|b|$.']],fp('V'))
+]};
+const S3=P=>{const{w,R,XC,Vm}=P,Cuf=1e6/(w*XC),wC=1/XC,gain=[0,XC/R],Vo=[0,XC/R*Vm],M=XC/R*Vm;
+P.res=['$V_{out}='+pol(Vo)+U.V+'$','$v_{out}(t)='+tdom(M,90,w).slice(1)];
+return[
+{st:'Ideal op-amp',q:'The $+$ input is grounded and there is negative feedback. What is $V_-$?',f:'$V_-=V_+$',o:['$0@,@mathrm{V}$ (virtual ground)','$V_{in}$','$V_{out}$','Infinite'],a:0,hl:['O'],h:'Negative feedback forces the two inputs to the same voltage.',e:'$V_+=0$, so $V_-=0$: a virtual ground.',rec:'$V_-=0$',w:[E,'$V_{in}$ is at the far end of $R$. The inverting input sits at the virtual ground $V_+=0$.','$V_{out}$ is the output. Negative feedback forces $V_-$ to equal the grounded $+$ input.','Negative feedback keeps $V_-$ finite: it equals $V_+=0$.']},
+{st:'Ideal op-amp',q:'How much current flows into an ideal op-amp input?',o:['$0@,@mathrm{A}$','$V_{in}/R$','$V_{out}/Z_f$','Depends on the gain'],a:0,hl:['O'],h:'An ideal op-amp has infinite input impedance.',e:'$I=0$, so all current through $R$ continues through the feedback path.',rec:'$I_{in}=0$',w:[E,'$V_{in}/R$ is the current through $R$. It all continues into the feedback path, not into the input.','$V_{out}/Z_f$ is the feedback current, not the input current.','Ideal means infinite input impedance, so input current is zero at any gain.']},
+mc({st:'Impedance',q:'Find $Z_f$ for the feedback capacitor ($C='+n(Cuf)+'@,@mu@mathrm{F}$, $@omega='+w+'$).',f:'$Z_C=@dfrac{1}{j@omega C}$',hl:['C'],h:'$@omega C='+g3(wC)+'$, so $1/'+g3(wC)+'='+XC+'$. A capacitor is $-j$.',e:'$Z_f=-j'+XC+'@,@Omega$.',rec:'$Z_f=-j'+XC+'@,@Omega$'},[0,-XC],[[[0,XC],'A capacitor is $-j$, not $+j$.'],[[0,-XC/10],'Check the reciprocal: $1/'+g3(wC)+'='+XC+'$, not $'+XC/10+'$.'],[[XC,0],'A capacitor is reactive, so $Z_f$ keeps its $j$.']],fr('O')),
+dirS('N1',['R','F'],['R','C'],'the inverting node'),kclS('N1',['R','F'],[],['R','C'],'the inverting node'),ohmS('R',['R']),ohmS('F',['C']),
+mc({st:'Gain',q:'Combine your Ohm’s-law terms. What is the gain $@dfrac{V_{out}}{V_{in}}=-@dfrac{Z_f}{R}$? ($R='+R+'@,@Omega$)',f:'$-@dfrac{'+cx([0,-XC])+'}{'+R+'}$',hl:['R','C'],h:'$-(-j'+XC+')/'+R+'$: two negatives make a positive.',e:'The gain is $'+cx(gain)+'$: magnitude $'+n(XC/R)+'$, phase $+90^@circ$.',rec:'Gain $='+cx(gain)+'$'},gain,[[C.neg(gain),'Check the sign: $-Z_f/R$ with $Z_f=-j'+XC+'$ gives a positive $j$.'],[[XC/R,0],'The magnitude is right, but $Z_f$ is imaginary so the gain has a $j$.'],[[0,R/XC],'You inverted it. The gain is $Z_f/R$, with $R$ on the bottom.']],fr('n')),
+mc({st:'Output phasor',q:'With $V_{in}='+Vm+'@angle0^@circ@,@mathrm{V}$, find $V_{out}$.',hl:['O'],h:'$V_{out}=('+cx(gain)+')@cdot'+Vm+'$.',e:'$V_{out}='+cx(Vo)+'='+pol(Vo)+'@,@mathrm{V}$.',rec:'$V_{out}='+pol(Vo)+'$ V',lbl:[['vo','V = '+plp(Vo)]]},Vo,[[C.neg(Vo),'The gain $j$ rotates by $+90^@circ$, not $-90^@circ$.'],[[M,0],'The gain has angle $+90^@circ$, so the output is shifted from $V_{in}$.'],[[0,R/XC*Vm],'The gain magnitude is $'+n(XC/R)+'$, so $|V_{out}|='+n(M)+'$.']],fp('V')),
+mc({st:'Time domain',q:'Write $v_{out}(t)$ at $@omega='+w+'$.',hl:[],h:'The angle is $+90^@circ$.',e:'$v_{out}='+tdom(M,90,w).slice(1)+'@,@mathrm{V}$ $=-'+n(M)+'@sin('+w+'t)$. A capacitor in the feedback makes an integrator.',rec:'$v_{out}='+tdom(M,90,w).slice(1)+'$ V'},tdom(M,90,w),[[tdom(M,-90,w),'$V_{out}=j'+n(M)+'$ is at $+90^@circ$, not $-90^@circ$.'],[tdom(M,0,w),'There is a $90^@circ$ phase shift, so it is not in phase with the source.'],['$'+n(M)+'@sin('+w+'t)$','$@cos(x+90^@circ)=-@sin(x)$, so $+90^@circ$ gives a negative sine.']],x=>x)
+]};
+const S4=P=>{const{w,XL1,XL2,XM,R,A}=P,Z1=[0,XL1],ZM=[0,XM],Z2=[R,XL2],Mmh=1000*XM/w,k=C.neg(C.div(ZM,Z2)),cc=C.add?0:0;
+const c=[Z1[0]+C.mul(ZM,k)[0],Z1[1]+C.mul(ZM,k)[1]],I1=C.div([A,0],c),I2=C.mul(k,I1),I1m=[I1[0]*1000,I1[1]*1000],I2m=[I2[0]*1000,I2[1]*1000],Vo=[I2[0]*R,I2[1]*R];
+P.res=['$I_1='+cx(I1m)+'@,@mathrm{mA}$','$V_o='+pol(Vo)+U.V+'$'];
+return[
+{st:'Dot convention',q:'Both mesh currents enter the dotted terminals. What sign does the mutual term $j@omega M I$ take in each KVL?',o:['Plus ($+$)','Minus ($-$)','Zero','Depends on $R$'],a:0,hl:['M','L1','L2'],h:'Currents entering dotted terminals at both coils means the coupling adds.',e:'Both currents enter dots, so the mutual voltage adds: $+j@omega M I$.',rec:'Mutual sign: $+$',w:[E,'Minus applies when one current enters a dot and the other leaves.','Coupled coils have $M@neq0$, so the mutual term is not zero.','The sign depends on dot positions and current directions, not on $R$.']},
+mc({st:'Mutual reactance',q:'Find $j@omega M$ for $M='+n(Mmh)+'@,@mathrm{mH}$ ($@omega='+w+'$).',f:'$Z_M=j@omega M$',hl:['M'],h:'$@omega M='+w+'@times'+g3(XM/w)+'='+XM+'$.',e:'$Z_M='+cx(ZM)+'@,@Omega$. Also $j@omega L_1='+cx(Z1)+'@,@Omega$ and $j@omega L_2=j'+XL2+'@,@Omega$.',rec:'$j@omega M='+cx(ZM)+'@,@Omega$'},ZM,[[[0,XM/10],'Arithmetic slip: $@omega M='+XM+'$, not $'+XM/10+'$.'],[[0,-XM],'Inductive reactances are positive imaginary ($+j$).'],[[XM,0],'Mutual reactance is imaginary, so keep the $j$.']],fr('O')),
+{st:'KVL mesh 1',q:'Build the KVL equation for mesh 1 (source side).',build:KM1,a:[0,1,2,3],hl:['S','L1','M'],h:'$L_1$ drops $j@omega L_1 I_1$ from its own current, plus $j@omega M I_2$ induced by the other coil.',e:'$'+cx(Z1)+'@,I_1+'+cx(ZM)+'@,I_2='+A+'$.',rec:'$'+cx(Z1)+'I_1+'+cx(ZM)+'I_2='+A+'$'},
+{st:'KVL mesh 2',q:'Build the KVL equation for mesh 2 (load side).',build:KM2,a:[0,1,2,3],hl:['L2','R','M'],h:'Mesh 2 has no source. $L_2$ and $R$ carry $I_2$, and $I_1$ induces $j@omega M I_1$.',e:'$'+cx(ZM)+'@,I_1+('+cx(Z2)+')I_2=0$.',rec:'$'+cx(ZM)+'I_1+('+cx(Z2)+')I_2=0$'},
+mc({st:'Solve',q:'From mesh 2, $I_2=k@,I_1$. Find $k=-@dfrac{'+cx(ZM)+'}{'+cx(Z2)+'}$.',hl:['L2','R'],h:'Multiply top and bottom by the conjugate of '+'$'+cx(Z2)+'$, then apply the leading minus.',e:'$k='+cx(k)+'$.',rec:'$I_2=('+cx(k)+')I_1$'},k,[[C.neg(k),'The minus sign matters: $I_2=-(Z_M/Z_2)I_1$.'],[C.conj(k),'Check the sign of the imaginary part after dividing.'],[C.neg(C.div(ZM,[R,0])),'You ignored $L_2$. The denominator is $R+j@omega L_2$, not just $R$.']],fr('n')),
+mc({st:'Solve',q:'Substitute into mesh 1 and solve for $I_1$ (in mA).',f:'$'+cx(Z1)+'+('+cx(ZM)+')('+cx(k)+')='+cx(c)+'$',hl:['S','L1'],h:'$I_1=@dfrac{'+A+'}{'+cx(c)+'}$ in A. Multiply by $1000$ for mA.',e:'$I_1='+cx(I1m)+'@,@mathrm{mA}='+pol(I1m)+'@,@mathrm{mA}$.',rec:'$I_1='+cx(I1m)+'$ mA'},I1m,[[C.conj(I1m),'Check the sign of the imaginary part when you divide.'],[C.div([A*1000,0],Z1),'That ignores the coupling. Divide by the full coefficient, not just $j@omega L_1$.'],[C.neg(I1m),'Check the overall sign of the division.']],fr('mA')),
+mc({st:'Solve',q:'Find $I_2=k@,I_1$ (in mA).',f:'$('+cx(k)+')('+cx(I1m)+')$',hl:['L2','R'],h:'Multiply the complex numbers: $(a+jb)(c+jd)=(ac-bd)+j(ad+bc)$.',e:'$I_2='+cx(I2m)+'@,@mathrm{mA}$.',rec:'$I_2='+cx(I2m)+'$ mA'},I2m,[[I1m,'That is $I_1$ itself. Multiply it by $k$.'],[C.conj(I2m),'Check the signs when you multiply the complex numbers.'],[C.neg(I2m),'Check the overall sign of the product.']],fr('mA')),
+mc({st:'Load voltage',q:'Find the load voltage $V_o=I_2R$.',f:'$V_o=('+cx(I2m)+'@,@mathrm{mA})('+R+'@,@Omega)$',hl:['R'],h:'Convert mA to A (divide by $1000$), then multiply by $'+R+'$.',e:'$V_o='+cx(Vo)+'='+pol(Vo)+'@,@mathrm{V}$. The load voltage depends on how strongly the coils couple.',rec:'$V_o='+pol(Vo)+'$ V',lbl:[['vo','V_o = '+plp(Vo)]]},Vo,[[C.conj(Vo),'The angle sign is flipped: check the sign of the imaginary part.'],[[I1[0]*R,I1[1]*R],'That uses $I_1$. The load current is $I_2$.'],[[Vo[0]*1000,Vo[1]*1000],'You forgot to convert mA to A.']],fp('V'))
+]};
+const LV=[
+{t:'AC Nodal Analysis',ic:'🔌',svg:SVG1,br:BR1,gen:gen1,steps:S1,done:P=>P.res},
+{t:'Dependent Sources',ic:'◇',svg:SVG2,br:BR2,gen:gen2,steps:S2,done:P=>P.res},
+{t:'Op-Amps',ic:'▷',svg:SVG3,br:BR3,gen:gen3,steps:S3,done:P=>P.res},
+{t:'Mutual Inductance',ic:'🧲',svg:SVG4,br:{},gen:gen4,steps:S4,done:P=>P.res}
+];
+
+function showMap(){$('lesson').style.display='none';$('home').style.display='';$('xp0').textContent='⚡ '+xp;
+const cu=LV.findIndex((_,k)=>!P.done.includes(k));
+$('path').innerHTML=LV.map((l,k)=>{const d=P.done.includes(k),c=k===cu;return `<div class="lv ${d?'':'cur'}">${c?'<div class="bub">START</div>':''}<button class="nb" data-k="${k}" >${d?'✓':l.ic}</button><small>Level ${k+1}<br>${l.t}</small></div>`}).join('');
+document.querySelectorAll('.nb').forEach(b=>b.onclick=()=>showModal(+b.dataset.k,false))}
+function beginLevel(k){cur=k;PP=LV[k].gen();S=LV[k].steps(PP);BR=LV[k].br||{};DIR={};Object.entries(BR).forEach(([id,b])=>{if(b.fix)DIR[id]=b.fix});i=0;$('home').style.display='none';$('lesson').style.display='flex';$('cir').innerHTML=LV[k].svg.replace(/§(\w+)§/g,(m,x)=>PP.tx[x]);$('cir').querySelector('svg').insertAdjacentHTML('beforeend','<g id="arr"></g>');
+$('work').innerHTML='<span>Your work appears here</span>';delete $('work').dataset.f;$('xp').textContent='⚡ '+xp;bindClicks();render()}
+function finishLevel(){if(!P.done.includes(cur))P.done.push(cur);P.xp=xp;try{localStorage.setItem('acl',JSON.stringify(P))}catch(e){}showMap()}
+
+Object.assign(LV[0],{goal:'Find the output voltage $V_{out}$ across the capacitor in an AC circuit with two unknown nodes.',objs:['Compute inductor and capacitor impedances at a given $@omega$','Convert impedances to admittances','Choose current directions and write KCL at each unknown node','Solve the complex equations and convert to the time domain']});
+Object.assign(LV[1],{goal:'Find the node voltage $V_1$ when a dependent current source $I_d=g@,V_x$ is in the circuit.',objs:['Identify the controlling variable of a dependent source','Express it using node voltages','Include the dependent source in your KCL equation','See how it changes the combined admittance at the node']});
+Object.assign(LV[2],{goal:'Find $V_{out}$ and $v_{out}(t)$ for an inverting op-amp with capacitor feedback.',objs:['Apply the ideal op-amp rules: virtual ground and zero input current','Write KCL at the inverting node with your own current directions','Derive the gain $-Z_f/R$','Interpret the 90° phase shift (an integrator)']});
+Object.assign(LV[3],{goal:'Find the mesh currents $I_1$, $I_2$ and the load voltage $V_o$ in two magnetically coupled coils.',objs:['Use the dot convention to set the sign of the mutual term','Compute the mutual reactance $j@omega M$','Write KVL for each mesh including coupling','Solve the simultaneous complex equations']});
+let pend=0;
+function showModal(k,inL){pend=k;const l=LV[k];$('mt').textContent='Level '+(k+1)+': '+l.t;$('mg').innerHTML='<b>Goal:</b> '+T(l.goal);$('mo').innerHTML=l.objs.map(o=>'<li>'+T(o)+'</li>').join('');
+$('mgo').textContent=inL?'Back to lesson':'Let’s go';$('mgo').onclick=()=>{$('modal').style.display='none';if(!inL)beginLevel(k)};$('mx').style.display=inL?'none':'';$('mx').onclick=()=>{$('modal').style.display='none'};$('modal').style.display='flex'}
+$('ib').onclick=()=>showModal(cur,true);
+$('xb').onclick=showMap;
+showMap();
+</script></body></html>
